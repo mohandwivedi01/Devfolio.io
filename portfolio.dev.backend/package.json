@@ -1,0 +1,14 @@
+{
+  "name": "portfolio.dev.backend",
+  "version": "1.0.0",
+  "description": "my portfolio",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mohan.dev",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
