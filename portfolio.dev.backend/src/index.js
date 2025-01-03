@@ -9,6 +9,7 @@ dotenv.config({
  
 connetDB()
 .then(() => {
+    console.log("app started")
     app.listen(process.env.PORT || 8000, () => {
         console.log(`server is listening on port: ${process.env.PORT || 8000}`);
     })

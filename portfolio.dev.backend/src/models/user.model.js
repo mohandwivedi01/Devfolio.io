@@ -1,12 +1,21 @@
-import mongoose from "mongoose";
+import {mongoose, Schema} from "mongoose";
 
 const userSchema = mongoose.Schema({
     name: {
         type: String,
-        require: true,
+        required: true,
     }, 
+    email: {
+        type: String,
+        required: true,
+    },
+    phone: {
+        type: String,
+        required: true,
+    },
     title: {
-        type: String
+        type: String,
+        required: true,
     },
     bio: {
         type: String,
@@ -14,10 +23,15 @@ const userSchema = mongoose.Schema({
     profilePic: {
         type: String
     },
+    resume: {
+        type: String
+    },
     socialLinks: {
-        typeof: Schema.Types.ObjectId,
-        ref: "SocialLink"
-    }
+        github: { type: String },
+        linkedin: { type: String },
+        twitter: { type: String },
+        other: { type: String }, // Additional links
+  },
 }, {timestamps: true})
 
 
