@@ -26,6 +26,5 @@ router.route("/register").post(upload.fields([
 ), createUser );
 
 
-
 export default router;
 
