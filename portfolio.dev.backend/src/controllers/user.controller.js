@@ -196,8 +196,7 @@ const refreshAccessToken = asyncHandler(async(req, res) => {
             incommingRefreshToken,
             process.env.REFRESH_TOKEN_SECRET
         )
-
-        console.log("decoded token: ", decodedToken)
+        // console.log("decoded token: ", decodedToken)
         
         const user = await User.findByIdAndUpdate(decodedToken?._id)
 
@@ -235,11 +234,95 @@ const refreshAccessToken = asyncHandler(async(req, res) => {
 })
 
 const getUserDetails = asyncHandler(async(req, res) => {
-    const {username} = req.params;
+    const {email} = req.params;
+    console.log("email: ",email);
+    if (!email?.trim()) {
+        throw new ApiError(404, "email is missing..");
+    }
+    
+    const user = await User.findOne({email: email}).select("-password -refreshToken -createdAt -updatedAt");
+    
+    console.log("user: ",user);
 
+    if (!user) {
+        throw new ApiError(404, `user with ${email} email is not found`);
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, user, "user fetched successfully.")
+    );
 })
 
 const updateDetails = asyncHandler(async(req, res) => {
+    const {name, email, phone, title, bio} = req.body;
+    if(!name || !title || !phone || !email || !password){
+        throw new ApiError(400, "name emial, password, phone, title can not be empty");
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set: {
+                name,
+                email,
+                phone,
+                title,
+                bio
+            }
+        },
+        {next:true} 
+   ).select("-password")
+
+   return res
+   .status(200)
+   .json(
+    new ApiResponse(200, {
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        title: user.title,
+        bio: user.bio
+    }, "details updated successfully")
+   )
+})
+
+const updateSocialLinks = asyncHandler(async(req, res) => {
+    const {} = req.body;
+})
+
+const changePassword = asyncHandler(async(req, res) => {
+    const {oldPassword, newPassword} = req.body;
+    const user = await User.findById(req.user?._id)
+
+    if (!newPassword || !oldPassword) {
+        throw new ApiError(404, "password is missing.");
+    }
+
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
+
+    if(!isPasswordCorrect){
+        throw new ApiError(401, "invalid password.");
+    }
+    
+    if (newPassword === oldPassword) {
+        throw new ApiError(401, "new password can't same as old password.");
+    }
+
+    user.password = newPassword;
+    user.save({validateBeforSave:false});
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, "password changed successfully.")
+    );
+     
+    
+})
+
+const updateResume = asyncHandler(async(req, res) => {
 
 })
 
@@ -251,5 +334,9 @@ export {
     logoutUser,
     refreshAccessToken,
     getUserDetails,
-    updateDetails
+    changePassword,
+    updateDetails,
+    updateSocialLinks,
+    updateResume,
+    
 }
