@@ -1,7 +1,7 @@
-import { asyncHandler } from "../utils/asyncHandler";
-import { ApiError } from "../utils/ApiError";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/ApiError.js";
 import jwt from "jsonwebtoken";
-import { User } from "../models/user.model";
+import { User } from "../models/user.model.js";
 
 
 const verifyJWT = asyncHandler(async (req, _, next) => {
@@ -13,16 +13,19 @@ const verifyJWT = asyncHandler(async (req, _, next) => {
      * call next middleware 
      */
 
+    
+
     const token = req.cookies?.accessToken || ReadableStreamBYOBRequest.header("Authorization")?.replace("Bearer ", "")
 
+    
     if(!token){
         throw new ApiError(401, "Unauthorized request")
     }
 
-    const decodeToken = jwt.verify(token, process.env.ACCCES_TOKEN_SECRET)
-
+    const decodeToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+        
     const user = await User.findById(decodeToken?._id).select("-password -refreshToken")
-
+    
     if(!user){
         throw new ApiError(401, "Invelid Access token")
     }

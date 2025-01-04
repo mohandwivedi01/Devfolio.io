@@ -1,13 +1,18 @@
 import { Router } from "express";
 import { upload } from "../middlewares/multer.middleware.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 import { 
-    createUser,
-    healthCheck
+    createUser, 
+    healthCheck,
+    loginUser,
+    logoutUser,
+    refreshAccessToken,
+    getUserDetails,
+    updateDetails
 
 } from "../controllers/user.controller.js";
 
-console.log("createUser: ", createUser);
 
 const router =  Router();
 
@@ -24,6 +29,13 @@ router.route("/register").post(upload.fields([
     }
 ]
 ), createUser );
+
+router.route("/login").post(loginUser)
+router.route("/logout").post(verifyJWT, logoutUser)
+router.route("/refresh-token").post(verifyJWT, refreshAccessToken)
+// router.route("update-details").patch(verifyJWT, updateDetails)
+// router.route("get-user-details").get(verifyJWT, getUserDetails)
+
 
 
 export default router;
