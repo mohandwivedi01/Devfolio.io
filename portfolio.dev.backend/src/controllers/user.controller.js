@@ -289,7 +289,34 @@ const updateDetails = asyncHandler(async(req, res) => {
 })
 
 const updateSocialLinks = asyncHandler(async(req, res) => {
-    const {} = req.body;
+    const {socialLinks} = req.body;
+    const {userId} = req.params;
+    if (socialLinks) {
+        throw new ApiError(401,"links are missing..");
+    }
+
+    const user = await User.findByIdAndUpdate(
+        userId,
+        {
+            $set: {
+                socialLinks
+            }
+        },
+        {next: true}
+    ).select("-password")
+
+    if(!user){
+        throw new ApiError(500, "something went wrong while updating user.");
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, {
+            socialLinks: user.socialLinks
+        }),
+        "Social links updated successfully."
+    );
 })
 
 const changePassword = asyncHandler(async(req, res) => {
@@ -323,7 +350,68 @@ const changePassword = asyncHandler(async(req, res) => {
 })
 
 const updateResume = asyncHandler(async(req, res) => {
+    let resume = "";
 
+    if(req.files && req.files.resume){
+        const resumeLocalPath = req.files?.resume[0]?.path;
+
+        if (!resumeLocalPath) {
+            throw new ApiError(400, "resume file is not available.");
+        }
+
+        resume = await uploadOnCloudinary(resumeLocalPath);
+
+        if (!resume.url) {
+            throw new ApiError(500, "something went wrong while uploding resume on cloudinary.")
+        }
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set: {
+                resume: resume.url
+            }
+        },
+        {next:true}
+    ).select("-password")
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user, "resume updated successfully."))
+})
+
+//add logic to delete previous pic from cloudinary
+const updateProfilePic = asyncHandler(async(req, res) => {
+    let profilePic = "";
+
+    if(req.files && req.files.profilePic){
+        const profilePicLocalPath = req.files?.profilePic[0]?.path;
+
+        if (!profilePicLocalPath) {
+            throw new ApiError(400, "resume file is not available.");
+        }
+
+        profilePic = await uploadOnCloudinary(profilePicLocalPath);
+
+        if (!profilePic.url) {
+            throw new ApiError(500, "something went wrong while uploding profilePic on cloudinary.")
+        }
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set: {
+                profilePic: profilePic.url
+            }
+        },
+        {next:true}
+    ).select("-password")
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user, "profilePic updated successfully."))
 })
 
 export {
@@ -338,5 +426,5 @@ export {
     updateDetails,
     updateSocialLinks,
     updateResume,
-    
+    updateProfilePic,
 }
