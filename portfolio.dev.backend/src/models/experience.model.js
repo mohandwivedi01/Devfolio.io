@@ -3,9 +3,11 @@ import mongoose, { mongo, Schema } from "mongoose";
 const experienceSchema = new mongoose.Schema({
     company: {
         type: String,
+        required: true
     },
     position: {
-        type: String
+        type: String,
+        required: true
     },
     started: {
         type: String
@@ -14,13 +16,15 @@ const experienceSchema = new mongoose.Schema({
         type: String
     },
     description: {
-        type: String
+        type: String,
+        
     },
     companyLogo: {
         type: String
     },
     companyLink: {
-        type: String
+        type: String,
+        trim: true
     },
     user: {
         type: Schema.Types.ObjectId,

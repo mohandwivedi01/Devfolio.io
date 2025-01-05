@@ -20,10 +20,14 @@ app.use(express.static("public"))
 app.use(cookieParser())
 
 //import routes
-import userRouter from './routes/user.route.js'
+import userRouter from "./routes/user.route.js"
+import skillsRouter from "./routes/skill.route.js"
+import experienceRouter from "./routes/experience.route.js"
 
 
 app.use("/api/v1/users", userRouter);
+app.use("api/v1/skills", skillsRouter);
+app.use("api/v1/experience", experienceRouter);
 
 // http://localhost:8000/api/v1/users/register
 
