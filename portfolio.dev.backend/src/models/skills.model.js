@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const skiilSchema = new mongoose.Schema({
     name:{
@@ -14,6 +14,10 @@ const skiilSchema = new mongoose.Schema({
     icon: {
         type: String
     },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    }
     
 },{timestamps:true})
 

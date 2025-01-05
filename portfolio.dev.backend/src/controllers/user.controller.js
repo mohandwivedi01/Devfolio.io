@@ -70,7 +70,7 @@ const createUser = asyncHandler(async (req, res) => {
 
         if(!profilePic){
             console.error("Cloudinary upload failed.");
-            throw new ApiError(500, "Something went wrong while uploading profile picture..");
+            throw new ApiError(502, "Something went wrong while uploading profile picture..");
         }
     }
 
@@ -103,10 +103,10 @@ const createUser = asyncHandler(async (req, res) => {
     }
 
     return res
-        .status(201)
+        .status(200)
         .json(
             new ApiResponse(
-                201, user, "user created successfully."
+                200, user, "user created successfully."
             )
         )
     
@@ -116,7 +116,7 @@ const loginUser = asyncHandler(async(req, res) => {
     const {email, password} = req.body;
     
     if(!email || !password){
-        throw new ApiError(404, "email or password can not be null");
+        throw new ApiError(400, "email or password can not be null");
     }
 
     const user = await User.findOne({email});
@@ -128,7 +128,7 @@ const loginUser = asyncHandler(async(req, res) => {
     const isPasswordValid =  await user.isPasswordCorrect(password)
 
     if(!isPasswordValid){
-        throw new ApiError(404, "password is not valid.")
+        throw new ApiError(400, "password is not valid.")
     }
 
     const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user._id);
@@ -237,7 +237,7 @@ const getUserDetails = asyncHandler(async(req, res) => {
     const {email} = req.params;
     console.log("email: ",email);
     if (!email?.trim()) {
-        throw new ApiError(404, "email is missing..");
+        throw new ApiError(400, "email is missing..");
     }
     
     const user = await User.findOne({email: email}).select("-password -refreshToken -createdAt -updatedAt");
@@ -292,7 +292,7 @@ const updateSocialLinks = asyncHandler(async(req, res) => {
     const {socialLinks} = req.body;
     const {userId} = req.params;
     if (socialLinks) {
-        throw new ApiError(401,"links are missing..");
+        throw new ApiError(400, "links are missing..");
     }
 
     const user = await User.findByIdAndUpdate(
@@ -324,7 +324,7 @@ const changePassword = asyncHandler(async(req, res) => {
     const user = await User.findById(req.user?._id)
 
     if (!newPassword || !oldPassword) {
-        throw new ApiError(404, "password is missing.");
+        throw new ApiError(400, "password is missing.");
     }
 
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);

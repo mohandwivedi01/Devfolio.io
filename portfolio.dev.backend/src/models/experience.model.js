@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose, { mongo, Schema } from "mongoose";
 
 const experienceSchema = new mongoose.Schema({
     company: {
@@ -22,6 +22,10 @@ const experienceSchema = new mongoose.Schema({
     companyLink: {
         type: String
     },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    }
 
 },{timestamps:true})
 

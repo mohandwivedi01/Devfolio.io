@@ -1,4 +1,4 @@
-import mongoose  from "mongoose";
+import mongoose, { Schema }  from "mongoose";
 
 const projectSchema = new mongoose.Schema({
     title: {
@@ -27,6 +27,10 @@ const projectSchema = new mongoose.Schema({
     like: {
         type: Number,
         default:0
+    },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
     }
 },{timestamps:true})
 

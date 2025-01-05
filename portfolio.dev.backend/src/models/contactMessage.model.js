@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const contactSchema = new mongoose.Schema({
     emial: {
@@ -9,6 +9,10 @@ const contactSchema = new mongoose.Schema({
     message: {
         type: String
     },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    }
     
 },{timestamps:true})
 
