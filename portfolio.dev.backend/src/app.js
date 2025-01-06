@@ -24,12 +24,14 @@ import userRouter from "./routes/user.route.js"
 import skillsRouter from "./routes/skill.route.js"
 import experienceRouter from "./routes/experience.route.js"
 import projectRouter from "./routes/project.route.js";
+import blogRouter from "./routes/blog.route.js";
 
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/skills", skillsRouter);
 app.use("/api/v1/experience", experienceRouter);
 app.use("/api/v1/project", projectRouter);
+app.use("/api/v1/blog", blogRouter);
 
 // http://localhost:8000/api/v1/users/register
 

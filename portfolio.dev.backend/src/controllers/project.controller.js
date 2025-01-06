@@ -246,6 +246,74 @@ const deleteProjectImage = asyncHandler(async(req, res) => {
     )
 })
 
+const addLikes = asyncHandler(async(req, res) => {
+    const {projectId} = req.params;
+
+    if (!projectId) {
+        throw new ApiError(400, "project id is missing.");
+    }
+
+    const project = await Project.findById(projectId); 
+
+    if (!project) {
+        throw new ApiError(404, "project not found.");
+    }
+
+    const updatedProject = await Project.findByIdAndUpdate(
+        projectId,
+        {
+            $inc:{
+                likes: 1
+            }
+        },
+        {new:true}
+    )
+
+    if (!updatedProject) {
+        throw new ApiError(500, "something went wrong while updating likes.");
+    }   
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, updatedProject, "project liked successfully.")
+    )
+})
+
+const removeLikes = asyncHandler(async(req, res) => {
+    const {projectId} = req.params;
+
+    if (!projectId) {
+        throw new ApiError(400, "project id is missing.");
+    }
+
+    const project = await Project.findById(projectId); 
+
+    if (!project) {
+        throw new ApiError(404, "project not found.");
+    }
+
+   const updatedProject = await Project.findByIdAndUpdate(
+        projectId,
+        {
+            $inc:{
+                likes: -1
+            }
+        },
+        {new:true}
+   )
+
+    if (!updatedProject) {
+        throw new ApiError(500, "something went wrong while updating likes.");
+    }   
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, updatedProject, "project liked successfully.")
+    )
+})
+
 // 
 export {
     addProjectDetails,
@@ -254,5 +322,7 @@ export {
     updateProjectDetails,
     deleteProject,
     addProjectImage,
-    deleteProjectImage   
+    deleteProjectImage,
+    addLikes,
+    removeLikes 
 }

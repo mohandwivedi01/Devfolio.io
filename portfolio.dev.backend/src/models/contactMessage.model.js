@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 
 const contactSchema = new mongoose.Schema({
-    emial: {
+    email: {
         type: String,
         trim: true,
         lowercase: true
