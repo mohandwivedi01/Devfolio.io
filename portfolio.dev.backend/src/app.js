@@ -23,11 +23,13 @@ app.use(cookieParser())
 import userRouter from "./routes/user.route.js"
 import skillsRouter from "./routes/skill.route.js"
 import experienceRouter from "./routes/experience.route.js"
+import projectRouter from "./routes/project.route.js";
 
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/skills", skillsRouter);
 app.use("/api/v1/experience", experienceRouter);
+app.use("/api/v1/project", projectRouter);
 
 // http://localhost:8000/api/v1/users/register
 

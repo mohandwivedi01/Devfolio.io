@@ -9,22 +9,20 @@ const projectSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    technologyUsed: [
+    technologiesUsed: [
         String
     ],
-    projectActiveLink: {
+    projectLink: {
         type: String
     },
     repoLink: {
         type: String
     },
-    image: {
-        type: String
-    },
+    images: [ ],
     role: {
         type: String
     },
-    like: {
+    likes: {
         type: Number,
         default:0
     },
