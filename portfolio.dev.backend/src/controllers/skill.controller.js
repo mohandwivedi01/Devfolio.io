@@ -8,26 +8,21 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 const addSkills = asyncHandler(async(req, res) => {
     const {skillName, level, iconLink} = req.body;
-    const {userId} = req.params;
 
     if(!skillName){
         throw new ApiError(400, "skill name is missing.");
     }
-
-    if (!Number.isInteger(level) || level <= 1 || level >= 5) {
-        throw new ApiError(401, "level is must be a number between 1 to 5.")
-    }
-
-    const user = await User.findByid({userId})
-
-    if (!user) {
-        throw new ApiError(404, "user is not found.");
+    console.log("level: ", level)
+    if (!Number.isInteger(level) || level < 1 || level > 5) {
+        console.log("level: ", level)
+        throw new ApiError(400, "level is must be a number between 1 to 5.")
     }
 
     const skill = await Skill.create({
         name: skillName,
         level,
-        iconLink: iconLink.trim()
+        iconLink: iconLink.trim(),
+        user: req.user?._id
     });
 
     if (!skill) {
@@ -42,20 +37,20 @@ const addSkills = asyncHandler(async(req, res) => {
 
 })
 
-const getSkills = asyncHandler(async(req, res) => {
+const getAllSkills = asyncHandler(async(req, res) => {
     const {userId} = req.params;
 
-    if (userId) {
+    if (!userId) {
         throw new ApiError(400, "userId is missing.");
     }
 
-    const user = await User.findByid({userId});
+    const user = await User.findById(userId);
 
     if(!user){
         throw new ApiError(404, "user is not found.");
     }
 
-    const skills = await skill.find({user: userId})
+    const skills = await Skill.find({user: userId})
 
     if (!skills) {
         throw new ApiError(500, "something went wrong while fetching skills.")
@@ -68,14 +63,38 @@ const getSkills = asyncHandler(async(req, res) => {
     )
 });
 
+const getSkillById = asyncHandler(async(req, res)=>{
+    const {skillId} = req.params;
+
+    if (!skillId) {
+        throw new ApiError(400, "skill id is missing.");
+    }
+
+    const skill = await Skill.findById(skillId);
+
+    if (!skill) {
+        throw new ApiError(404, "skill is not found.");
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, skill, "skill fetched successfully.")
+    )
+});
+
 const updateSkills = asyncHandler(async(req, res) => {
     const {skillId} = req.params;
     const {skillName, level, iconLink} = req.body
 
-    const skill = await Skill.findByid({skillId});
+    const skill = await Skill.findById(skillId);
     if (!skill) {
         throw new ApiError(404, "skill not found");
     }
+    if (level < 1 || level > 5) {
+        throw new ApiError(400, "level is must be a number between 1 to 5.")
+    }
+    
 
     if (skill.user.toString() !== req.user?._id.toString()) {
         throw new ApiError(401, "you are not authorized to update the skill.");
@@ -87,7 +106,7 @@ const updateSkills = asyncHandler(async(req, res) => {
             $set: {
                 name: skillName,
                 level,
-                iconLink
+                icon: iconLink
             }
         },
         {new:true}
@@ -112,7 +131,7 @@ const deleteSkills = asyncHandler(async(req, res) => {
         throw new ApiError(400, "skill is missing.");
     }
 
-    const skill = await Skill.findByid({skillId});
+    const skill = await Skill.findById(skillId);
 
     if (!skill) {
         throw new ApiError(404, "skill is not found.");
@@ -122,7 +141,7 @@ const deleteSkills = asyncHandler(async(req, res) => {
         throw new ApiError(401, "you are not authorized to delete this skill");
     }
 
-    const response = await Skill.findByIdAndDelete({skillId});
+    const response = await Skill.findByIdAndDelete(skillId);
 
     if (!response) {
         throw new ApiError(500, "something went wrong while deleting the skill.");
@@ -137,7 +156,8 @@ const deleteSkills = asyncHandler(async(req, res) => {
 
 export {
     addSkills,
-    getSkills,
+    getAllSkills,
+    getSkillById,
     updateSkills,
     deleteSkills
 }

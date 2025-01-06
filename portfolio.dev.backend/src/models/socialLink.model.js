@@ -17,4 +17,4 @@ const socialLinksSchema = new mongoose.Schema({
     }
 },{timestamps:true});
 
-export const SocialLinks = mongoose.Model("SocialLinks", socialLinksSchema);
+export const SocialLinks = mongoose.model("SocialLinks", socialLinksSchema);

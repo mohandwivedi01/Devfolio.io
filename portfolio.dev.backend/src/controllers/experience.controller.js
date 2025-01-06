@@ -6,24 +6,22 @@ import {ApiResponse } from "../utils/ApiResponse.js"
 
 
 const addExperienceDetails = asyncHandler(async(req, res) => {
-    const {company, position, duration, description, companyLogo, companyLink} = req.body;
+    const {company, position, started, end, description, companyLogo, companyLink} = req.body;
     
     if(!company || !position) {
         throw new ApiError(400, "company name and position is missing.");
     }
 
-    if(!Number.isInteger(duration)){
-        throw new ApiError(400, "duration must be a number.");
-    }
 
     const experienceDetails = await Experience.create({
         company,
         position,
-        duration,
+        started,
+        end,
         description,
         companyLogo,
         companyLink: companyLink.trim(),
-        User: req.user?.id
+        user: req.user?.id
     })
 
     if (!experienceDetails) {
@@ -45,6 +43,12 @@ const getExperienceDetails = asyncHandler(async(req, res) => {
         throw new ApiError(400, "userId is missing.");
     }
 
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new ApiError(404, "user not found.");
+    }
+
     const userExperienceDetils = await Experience.find({user: userId})
 
     if (!userExperienceDetils) {
@@ -58,8 +62,28 @@ const getExperienceDetails = asyncHandler(async(req, res) => {
     )
 })
 
+const getExperienceDetailsById = asyncHandler(async(req, res) => {
+    const {experienceId} = req.params;
+
+    if (!experienceId) {
+        throw new ApiError(400, "experienceId is missing.");
+    }
+
+    const experience = await Experience.findById(experienceId);
+
+    if (!experience) {
+        throw new ApiError(404, "experience details not found.");
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, experience, "user experience Detils fetched successfully.")
+    )
+})
+
 const updateExperienceDetails = asyncHandler(async(req, res) => {
-    const {company, position, duration, description, companyLogo, companyLink} = req.body;
+    const {company, position, started, end, description, companyLogo, companyLink} = req.body;
     const {experienceDetailsId} = req.params;
 
     if(!experienceDetailsId){
@@ -70,11 +94,11 @@ const updateExperienceDetails = asyncHandler(async(req, res) => {
         throw new ApiError(400, "company name and position is missing.");
     }
 
-    if(!Number.isInteger(duration)){
-        throw new ApiError(400, "duration must be a number.");
-    }
+    // if(!Number.isInteger(duration)){
+    //     throw new ApiError(400, "duration must be a number.");
+    // }
 
-    const experienceDetails = await Experience.findById({experienceDetailsId});
+    const experienceDetails = await Experience.findById(experienceDetailsId);
 
     if (!experienceDetails) {
         throw new ApiError(404, "experienceDetails not found.");
@@ -90,23 +114,24 @@ const updateExperienceDetails = asyncHandler(async(req, res) => {
             $set: {
                 company,
                 position,
-                duration,
+                started,
+                end,
                 description,
                 companyLogo,
-                companyLink: companyLink.trim(),
+                companyLink: companyLink?.trim(),
             }
         },
         {new:true}
     )
 
-    if (!updateExperienceDetails) {
+    if (!updatedExperienceDetails) {
         throw new ApiError(500, "something went wrong while updating experience details.");
     }
 
     return res
     .status(200)
     .json(
-        new ApiResponse(200, updateExperienceDetails, "user experience details updated successfully.")
+        new ApiResponse(200, updatedExperienceDetails, "user experience details updated successfully.")
     )
 })
 
@@ -117,7 +142,7 @@ const deleteExperienceDetails = asyncHandler(async(req, res) => {
         throw new ApiError(400, "experienceDetaid id is missing.");
     }
 
-    const userExperienceDetails = await Experience.findById({experienceDetailsId});
+    const userExperienceDetails = await Experience.findById(experienceDetailsId);
 
     if (!userExperienceDetails) {
         throw new ApiError(404, "experience details not found.");
@@ -127,7 +152,7 @@ const deleteExperienceDetails = asyncHandler(async(req, res) => {
         throw new ApiError(401, "you are not authorized to delete this.");
     }
 
-    const response = await Experience.findByIdAndDelete({experienceDetailsId});
+    const response = await Experience.findByIdAndDelete(experienceDetailsId);
 
     if(!response){
         throw new ApiError(500, "something went wrong while delete experience details");
@@ -143,6 +168,7 @@ const deleteExperienceDetails = asyncHandler(async(req, res) => {
 export {
     addExperienceDetails,
     getExperienceDetails,
+    getExperienceDetailsById,
     updateExperienceDetails,
     deleteExperienceDetails
 }

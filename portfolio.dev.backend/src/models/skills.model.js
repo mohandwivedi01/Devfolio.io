@@ -21,4 +21,4 @@ const skiilSchema = new mongoose.Schema({
     
 },{timestamps:true})
 
-export const Skill = mongoose.Model("Skill", skiilSchema);
+export const Skill = mongoose.model("Skill", skiilSchema);

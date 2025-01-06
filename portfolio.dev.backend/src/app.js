@@ -26,8 +26,8 @@ import experienceRouter from "./routes/experience.route.js"
 
 
 app.use("/api/v1/users", userRouter);
-app.use("api/v1/skills", skillsRouter);
-app.use("api/v1/experience", experienceRouter);
+app.use("/api/v1/skills", skillsRouter);
+app.use("/api/v1/experience", experienceRouter);
 
 // http://localhost:8000/api/v1/users/register
 
