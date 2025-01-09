@@ -5,7 +5,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
 
-
+//tested
 const healthCheck = asyncHandler(async(req, res) => {
     return res
     .status(200)
@@ -13,7 +13,7 @@ const healthCheck = asyncHandler(async(req, res) => {
         new ApiResponse(200, null, "app is running...")
     )
 })
-
+//tested
 const generateAccessAndRefreshToken = async(userId) => {
     try {
         const user = await User.findById(userId)
@@ -32,7 +32,7 @@ const generateAccessAndRefreshToken = async(userId) => {
         throw new ApiError(500, `somthing went wrong while generating access and refresh token: ${error}`)
     }
 }
-
+//tested
 const createUser = asyncHandler(async (req, res) => {
     /**
      * get user details from client
@@ -111,7 +111,7 @@ const createUser = asyncHandler(async (req, res) => {
         )
     
 });
-
+//tested
 const loginUser = asyncHandler(async(req, res) => {
     const {email, password} = req.body;
     
@@ -152,7 +152,7 @@ const loginUser = asyncHandler(async(req, res) => {
         )
     )
 })
-
+//tested
 const logoutUser = asyncHandler(async(req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
@@ -179,25 +179,22 @@ const logoutUser = asyncHandler(async(req, res) => {
         )
         
 })
-
+//tested
 const refreshAccessToken = asyncHandler(async(req, res) => {
 
     const incommingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
-    console.log("incommingRefreshToken: ", incommingRefreshToken);
+    // console.log("incommingRefreshToken: ", incommingRefreshToken);
     
     if(!incommingRefreshToken){
         throw new ApiError(401, "unauthorized request");
     }
     
     try {
-        console.log("inside try block ");
         
         const decodedToken = jwt.verify(
             incommingRefreshToken,
             process.env.REFRESH_TOKEN_SECRET
-        )
-        // console.log("decoded token: ", decodedToken)
-        
+        )        
         const user = await User.findByIdAndUpdate(decodedToken?._id)
 
         if(!user){
@@ -232,7 +229,7 @@ const refreshAccessToken = asyncHandler(async(req, res) => {
         throw new ApiError(401, error?.message || "Invalid refresh token")
     }
 })
-
+//tested
 const getUserDetails = asyncHandler(async(req, res) => {
     const {email} = req.params;
     console.log("email: ",email);
@@ -318,23 +315,25 @@ const updateSocialLinks = asyncHandler(async(req, res) => {
         "Social links updated successfully."
     );
 })
-
+//tested
 const changePassword = asyncHandler(async(req, res) => {
     const {oldPassword, newPassword} = req.body;
-    const user = await User.findById(req.user?._id)
 
+    console.log("oldPassword: ", oldPassword);
+    console.log("newPassword: ", newPassword);
     if (!newPassword || !oldPassword) {
         throw new ApiError(400, "password is missing.");
     }
 
+    const user = await User.findById(req.user?._id);
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
 
     if(!isPasswordCorrect){
-        throw new ApiError(401, "invalid password.");
+        throw new ApiError(401, "invalid old password.");
     }
     
     if (newPassword === oldPassword) {
-        throw new ApiError(401, "new password can't same as old password.");
+        throw new ApiError(401, "new password can not same as old password.");
     }
 
     user.password = newPassword;
@@ -344,11 +343,9 @@ const changePassword = asyncHandler(async(req, res) => {
     .status(200)
     .json(
         new ApiResponse(200, "password changed successfully.")
-    );
-     
-    
+    );    
 })
-
+//tested
 const updateResume = asyncHandler(async(req, res) => {
     let resume = "";
 
@@ -364,6 +361,8 @@ const updateResume = asyncHandler(async(req, res) => {
         if (!resume.url) {
             throw new ApiError(500, "something went wrong while uploding resume on cloudinary.")
         }
+    } else{
+        throw new ApiError(400, "resume file is missing.");
     }
 
     const user = await User.findByIdAndUpdate(
@@ -374,7 +373,7 @@ const updateResume = asyncHandler(async(req, res) => {
             }
         },
         {next:true}
-    ).select("-password")
+    ).select("-password -refreshToken -data, -profilePic")
 
     return res
     .status(200)
@@ -417,7 +416,6 @@ const updateProfilePic = asyncHandler(async(req, res) => {
 export {
     createUser, 
     healthCheck,
-    generateAccessAndRefreshToken,
     loginUser,
     logoutUser,
     refreshAccessToken,

@@ -10,7 +10,8 @@ import {
     refreshAccessToken,
     getUserDetails,
     updateDetails,
-    changePassword
+    changePassword,
+    updateResume
 
 } from "../controllers/user.controller.js";
 
@@ -35,8 +36,14 @@ router.route("/login").post(loginUser)
 router.route("/logout").post(verifyJWT, logoutUser)
 router.route("/refresh-token").post(verifyJWT, refreshAccessToken)
 router.route("/update-details").patch(verifyJWT, updateDetails)
-router.route("/get-user-details/:email").get(verifyJWT, getUserDetails)
+router.route("/get-details/:email").get(verifyJWT, getUserDetails)
 router.route("/change-password").post(verifyJWT, changePassword)
+router.route("/update-details").post(verifyJWT, changePassword)
+
+router.route("/update-resume").patch(verifyJWT, upload.fields([{
+    name: "resume",
+    maxCount: 1
+}]), updateResume)
 
 
 export default router;

@@ -25,4 +25,4 @@ router.route('/delete-project-image/:projectId').patch(verifyJWT, deleteProjectI
 router.route('/add-project-like/:projectId').patch(addLikes);
 router.route('/remove-project-like/:projectId').patch(removeLikes);
 
-export default {router};
+export default router;
